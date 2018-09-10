@@ -51,10 +51,15 @@ int main() // (int argc, char* argv[])
 
         struct sockaddr_in client_addr;
         int client_socket;
-	int ret = 0;
-        socklen_t length;
+	    socklen_t length;
+		int ret = 0;
+		int ret1 = 0；
         char Buffer[BUFFER_SIZE];
         char sendbuffer[BUFFER_SIZE];
+		char data1[BUFFER_SIZE]={",0,0,0,00x0a"};
+		char data[BUFFER_SIZE];
+		char stat[8]={"#"};
+		memset(data,0,sizeof(data));
         // 连接客户端Socket
         length = sizeof(client_addr);
         client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &length);
@@ -69,32 +74,27 @@ int main() // (int argc, char* argv[])
         {
             bzero(Buffer, BUFFER_SIZE);
             length = recv(client_socket, Buffer, BUFFER_SIZE, 0);
-
+            system("lxterminal -e ./I2C");
             if (length < 0)
             {
-                printf("Server Recieve Data Failed!\n");
+                printf("Unknown Instruct!");
                 break;
             }           
 
-            if ('q' == Buffer[0])
+           else 
             {
-                printf("Quit!\n");
-                break;
+                read_fd = ("./fifo",O_RDONLY);
+                ret1=read(read_fd,sendbuffer,BUFFER_SIZE);	
+                close(reead_fd);	
+                strcat(data,stat);
+                strcat(data,sendbuffer);
+                strcat(data,data1);
+                send(client_socket,data,(int)strlen(data),0);
+                memset(data,0,sizeof(data));				
             }
 
-            printf("%s\n", Buffer);
-
-	    scanf("%s",sendbuffer);
-	    ret=send(client_socket,sendbuffer,(int)strlen(sendbuffer),0);
-	    if(ret==-1)
-	      {
-		printf("Send Info Error");
-	      }
-            break;
-
-        }
-	
-	
+          
+	    }
          close(client_socket);
     }
 
