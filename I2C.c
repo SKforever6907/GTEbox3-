@@ -6,10 +6,11 @@
 int main(void)
 {
     int fd;
-	int write_fd;
+    int write_fd;
+    int ret;
     char buf[3];
     char val,value;
-	char buffer[4];
+    char buffer[4];
     float flight;
     fd=open("/dev/i2c-1",O_RDWR);
     if(fd<0)
