@@ -54,9 +54,10 @@ int main() // (int argc, char* argv[])
 	    socklen_t length;
 		int ret = 0;
 		int ret1 = 0；
+		int read_fd;
         char Buffer[BUFFER_SIZE];
         char sendbuffer[BUFFER_SIZE];
-		char data1[BUFFER_SIZE]={",0,0,0,00x0a"};
+		char data1[BUFFER_SIZE]={",0,0,0,0"};
 		char data[BUFFER_SIZE];
 		char stat[8]={"#"};
 		memset(data,0,sizeof(data));
@@ -75,7 +76,7 @@ int main() // (int argc, char* argv[])
             bzero(Buffer, BUFFER_SIZE);
             length = recv(client_socket, Buffer, BUFFER_SIZE, 0);
             system("lxterminal -e ./I2C");
-            if (length < 0)
+            if (strcmp(Buffer,"all")!=0)
             {
                 printf("Unknown Instruct!");
                 break;
@@ -84,12 +85,13 @@ int main() // (int argc, char* argv[])
            else 
             {
                 read_fd = ("./fifo",O_RDONLY);
-                ret1=read(read_fd,sendbuffer,BUFFER_SIZE);	
+                ret=read(read_fd,sendbuffer,BUFFER_SIZE);	
                 close(reead_fd);	
                 strcat(data,stat);
                 strcat(data,sendbuffer);
                 strcat(data,data1);
-                send(client_socket,data,(int)strlen(data),0);
+				data[strlen(data)]=0x0a;
+                ret1=send(client_socket,data,(int)strlen(data),0);
                 memset(data,0,sizeof(data));				
             }
 
