@@ -5,10 +5,11 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <fcntl.h>
+#include <errno.h>
 #define SERVER_PORT 5000
 #define LENGTH_OF_LISTEN_QUEUE 20
-#define BUFFER_SIZE 1240
+#define BUFFER_SIZE 100
 
 int main() // (int argc, char* argv[])
 {
@@ -53,10 +54,10 @@ int main() // (int argc, char* argv[])
         int client_socket;
 	    socklen_t length;
 		int ret = 0;
-		int ret1 = 0；
+		int ret1 =0;
 		int read_fd;
-        char Buffer[BUFFER_SIZE];
-        char sendbuffer[BUFFER_SIZE];
+                char Buffer[BUFFER_SIZE];
+                char sendbuffer[BUFFER_SIZE];
 		char data1[BUFFER_SIZE]={",0,0,0,0"};
 		char data[BUFFER_SIZE];
 		char stat[8]={"#"};
@@ -75,29 +76,31 @@ int main() // (int argc, char* argv[])
         {
             bzero(Buffer, BUFFER_SIZE);
             length = recv(client_socket, Buffer, BUFFER_SIZE, 0);
-            system("lxterminal -e ./I2C");
-            if (strcmp(Buffer,"all")!=0)
-            {
+	    system("lxterminal -e ./I2C");
+	    if(strcmp(Buffer,"all")!=0)
+               
+	    {
                 printf("Unknown Instruct!");
                 break;
-            }           
+	    }      
 
-           else 
-            {
-                read_fd = ("./fifo",O_RDONLY);
+	    else 
+	     {
+	         
+		read_fd=open("./fifo",O_RDONLY);
                 ret=read(read_fd,sendbuffer,BUFFER_SIZE);	
-                close(reead_fd);	
+                close(read_fd);	
                 strcat(data,stat);
-                strcat(data,sendbuffer);
+	        strcat(data,sendbuffer);
                 strcat(data,data1);
-				data[strlen(data)]=0x0a;
+		data[strlen(data)]=0x0a;
                 ret1=send(client_socket,data,(int)strlen(data),0);
                 memset(data,0,sizeof(data));				
-            }
+	      }
 
           
-	    }
-         close(client_socket);
+	 }
+        close(client_socket); 
     }
 
     close(server_socket);
