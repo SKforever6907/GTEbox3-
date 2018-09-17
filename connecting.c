@@ -54,13 +54,17 @@ int main() // (int argc, char* argv[])
         int client_socket;
 	    socklen_t length;
 		int ret = 0;
+		int rett = 0;
 		int ret1 =0;
-		int read_fd;
+		int read_fd1;
+		int read_fd2;
                 char Buffer[BUFFER_SIZE];
-                char sendbuffer[BUFFER_SIZE];
-		char data1[BUFFER_SIZE]={",0,0,0,0"};
+                char lightbuffer[BUFFER_SIZE];
+		char tempbuffer[BUFFER_SIZE];
+        
 		char data[BUFFER_SIZE];
 		char stat[8]={"#"};
+		char end[4]={"0"};
 		memset(data,0,sizeof(data));
         // 连接客户端Socket
         length = sizeof(client_addr);
@@ -76,7 +80,7 @@ int main() // (int argc, char* argv[])
         {
             bzero(Buffer, BUFFER_SIZE);
             length = recv(client_socket, Buffer, BUFFER_SIZE, 0);
-	    system("lxterminal -e ./I2C");
+	    
 	    if(strcmp(Buffer,"all")!=0)
                
 	    {
@@ -86,13 +90,18 @@ int main() // (int argc, char* argv[])
 
 	    else 
 	     {
-	         
-		read_fd=open("./fifo",O_RDONLY);
-                ret=read(read_fd,sendbuffer,BUFFER_SIZE);	
-                close(read_fd);	
+	        system("lxterminal -e ./I2C");
+	        system("lxterminal -e ./spi");
+		read_fd1=open("./fifo",O_RDONLY);
+		read_fd2=open("./swap",O_RDONLY);
+		rett=read(read_fd1,tempbuffer,BUFFER_SIZE);
+                ret=read(read_fd2,lightbuffer,BUFFER_SIZE);	
+                close(read_fd1);
+		close(read_fd2);
                 strcat(data,stat);
-	        strcat(data,sendbuffer);
-                strcat(data,data1);
+	        strcat(data,tempbuffer);
+		 strcat(data,lightbuffer);
+		strcat(data,end);
 		data[strlen(data)]=0x0a;
                 ret1=send(client_socket,data,(int)strlen(data),0);
                 memset(data,0,sizeof(data));				
